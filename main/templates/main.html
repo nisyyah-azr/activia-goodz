@@ -1,13 +1,14 @@
 <!--menggunakan base.html sebagai template utama.-->
 {% extends 'base.html' %} 
 {% block content %}
-
 <h1>Activia Goodz</h1>
 
 <h5>NPM: </h5>
 <p>{{ npm }}</p>
+
 <h5>Name: </h5>
 <p>{{ name }}<p>
+
 <h5>Class: </h5>
 <p>{{ class }}</p>
 
@@ -15,7 +16,20 @@
   <button>+ Add Product</button>
 </a>
 
+<a href="{% url 'main:logout' %}">
+  <button>Logout</button>
+</a>
+
+<h5>Sesi terakhir login: {{ last_login }}</h5>
+
 <hr>
+
+<a href="?filter=all">
+    <button type="button">All Products</button>
+</a>
+<a href="?filter=my">
+    <button type="button">My Products</button>
+</a> 
 
 {% if not products_list %}
 <p>Belum ada data produk pada Activia Goodz.</p>

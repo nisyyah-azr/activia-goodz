@@ -158,7 +158,7 @@ Cara mengimplementasikan checklist secara step-by-step
 
     4. Membuat halaman form untuk menambahkan objek model pada app sebelumnya. Ini dilakukan dengan membuat file baru bernama forms.py untuk membuat struktur form yang dapat menerima data Product baru. Kemudian tambahkan fungsi untuk membuat dan menampilkan produk pada file views.py pada direktori main. Kemudian import fungsi-fungsi tadi dan tambahkan path URL dalam variabel urlpatterns.
 
-    5. Membuat halaman yang menampilkan detail dari setiap data objek model. Ini dilakukan menambahkan 'products_list = Product.objects.all()' dan menambahkan list tsb pada context pada views.py dalam direktori main. Kemudian menambahkan path baru untuk create_product dan show_product pada urls.py dalam direktori main
+    5. Membuat halaman yang menampilkan detail dari setiap data objek model. Ini dilakukan menambahkan 'product_list = Product.objects.all()' dan menambahkan list tsb pada context pada views.py dalam direktori main. Kemudian menambahkan path baru untuk create_product dan show_product pada urls.py dalam direktori main
 
 screenshot hasil akses URL pada Postman:
 ristek.link/screenshot-Postman-NA
