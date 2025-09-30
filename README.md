@@ -271,12 +271,19 @@ Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-b
     Tambahkan tag <a> </a> yang berisi button yang ingin dibuat, dalam hal ini edit dan delete. Tambahkan pada card product agar tombol terlihat pada card
 
     Membuat navigation bar (navbar) untuk fitur-fitur pada aplikasi yang responsive terhadap perbedaan ukuran device, khususnya mobile dan desktop
-    Saya menambahkan kategori navigation baru seperti women, men, kids, dan equipment yang mana merupakan kategori dari suatu produk yang sudah didefiniskan pada models.py. Hal ini dilakukan dengan menambahkan filter baru pada show_main dan menambahkan :
-    untuuk tampilan desktop:
-     <a href="{% url 'main:show_main' %}?filter={{ current_user_filter }}&category=[category nya]" class="text-gray-300 hover:text-white font-medium transition-colors"> [Nama pada Navbar]
-          </a> 
-    untuuk tampilan mobile:
-    <a href="{% url 'main:show_main' %}?filter={{ current_user_filter }}&category=[category nya]" class="block text-gray-300 hover:text-white font-medium py-3 transition-colors"> [Nama pada Navbar]
+    Saya membuat nama dan logo toko saya (Activia Goodz) jika di klik bisa kembali ke halaman awal. Ini dilakukan dengan menambahkan:
+        <a href="{% url 'main:show_main' %}?filter=all" class="transition-colors hover:opacity-80"> 
+            <img src="{% static 'image/logo.png' %}" alt="Activia Goodz Logo" class="h-8 w-auto mr-3">
+            <h1 class="text-3xl"> 
+              <span class="font-bold italic text-white">Activia Goodz</span> 
+            </h1>
           </a>
+    Saya menambahkan kategori navigation baru seperti women, men, kids, dan equipment yang mana merupakan kategori dari suatu produk yang sudah didefiniskan pada models.py. Hal ini dilakukan dengan menambahkan filter baru pada show_main dan menambahkan :
+    - untuk tampilan desktop:
+        <a href="{% url 'main:show_main' %}?filter={{ current_user_filter }}&category=[category nya]" class="text-gray-300 hover:text-white font-medium transition-colors"> [Nama pada Navbar]
+            </a> 
+    - untuk tampilan mobile:
+        <a href="{% url 'main:show_main' %}?filter={{ current_user_filter }}&category=[category nya]" class="block text-gray-300 hover:text-white font-medium py-3 transition-colors"> [Nama pada Navbar]
+            </a>
     pada navbar.html. sisanya mirip dengan yang ada pada tutorial
     
