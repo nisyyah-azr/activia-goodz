@@ -1,0 +1,84 @@
+{% load static %}
+
+<div class="group relative flex flex-col overflow-hidden border border-gray-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+  
+  <div class="aspect-video relative overflow-hidden">
+    <a href="{% url 'main:show_product' product.id %}" class="block w-full h-full">
+      {% if product.thumbnail %}
+        <img src="{{ product.thumbnail }}" alt="{{ product.name }}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+      {% else %}
+        <div class="h-full w-full bg-gray-100 flex items-center justify-center">
+          <svg class="w-10 h-10 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+          </svg>
+        </div>
+      {% endif %}
+    </a>
+
+    <div class="absolute top-3 left-3">
+      <span class="inline-block bg-cyan-600/90 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+        {{ product.get_category_display }}
+      </span>
+    </div>
+
+    <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
+      {% if product.is_featured %}
+        <span class="inline-flex items-center gap-x-1.5 block bg-blue-100/80 px-2 py-1 text-xs font-medium text-blue-700 backdrop-blur-sm">
+          <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c.321-.772 1.305-.772 1.626 0l1.823 4.416 4.862.707c.85.124 1.188 1.166.574 1.765l-3.518 3.428.83 4.843c.145.845-.743 1.492-1.503 1.09L10 16.59l-4.347 2.284c-.76.402-1.648-.245-1.503-1.09l.83-4.843L1.462 9.772c-.614-.6-.276-1.641.574-1.765l4.863-.707L8.72 2.884z" clip-rule="evenodd" /></svg>
+          Featured
+        </span>
+      {% endif %}
+      {% if product.is_product_hot %}
+        <span class="inline-flex items-center gap-x-1.5 block-full bg-red-100/80 px-2 py-1 text-xs font-medium text-red-700 backdrop-blur-sm">
+          <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.238 3.855c.388-1.013-.834-1.855-1.588-1.123-.332.324-.593.738-.76 1.196C8.718 2.728 7.5 3.57 7.11 4.883 6.362 5.615 6 6.742 6 7.917c0 2.923 2.531 4.542 4.029 5.816.582.496 1.144.983 1.688 1.454.321.278.63.551.928.815.298.264.58.514.849.75.27.236.52.45.748.642.228.192.437.36.621.503.185.143.344.26.472.348.128.088.223.145.28.167.058.022.079.027.059.009-.02-.018-.09-.076-.207-.173-.117-.097-.276-.23-.473-.393-.197-.163-.427-.353-.68-.564-.253-.21-.52-.44-.793-.682-.273-.242-.544-.49-.807-.738-.263-.248-.512-.49-.745-.722-.233-.232-.448-.454-.643-.66-.195-.206-.367-.393-.513-.556-.146-.163-.261-.3-.34-.403-.078-.103-.118-.16-.118-.16s-.027.027-.083.083c-.055.056-.147.15-.272.28-.125.13-.283.296-.468.49-.185.194-.395.42-.622.667-.227.247-.467.504-.71.76-.243.256-.48.503-.702.73-.222.227-.42.428-.588.595-.168.167-.303.298-.403.39-.1.092-.16.147-.18.165-.02.018-.01.012.01.03.02.018.08.076.202.176.122.101.28.232.472.398.192.166.417.355.668.568.25.213.514.444.78.69.266.246.524.498.767.742.243.244.47.48.675.698.205.218.385.41.536.567.15.157.266.27.34.336.074.066.11.092.104.084-.006-.006-.057-.05-.145-.13-.088-.08-.21-.197-.36-.345-.15-.148-.324-.325-.518-.523-.194-.198-.398-.415-.606-.645-.208-.23-.414-.467-.608-.7-.194-.233-.37-.46-.525-.675-.155-.215-.282-.41-.38-.575-.098-.165-.165-.3-.195-.39-.03-.09-.024-.135.014-.235.038-.1.11-.213.21-.335.1-.122.225-.25.37-.382.145-.132.302-.26.468-.382.166-.122.338-.233.508-.33.17-.097.33-.178.472-.24.143-.062.26-.098.336-.106.076-.008.113.004.135.03.022.026.03.064.022.108-.008.044-.03.095-.068.154-.038.059-.09.125-.154.196-.064.07-.138.145-.22.22-.164.15-.35.31-.55.47-.2.16-.407.318-.61.465-.203.147-.39.276-.554.382-.164.106-.295.183-.383.226-.088.043-.13.054-.121.032.008-.022.083-.09.223-.226.14-.136.315-.304.518-.5.203-.196.427-.41.665-.634.238-.224.48-.45.713-.667.233-.217.45-.42.645-.598.195-.178.364-.328.502-.444.138-.116.24-.19.294-.214.054-.024.06-.018-.01-.046-.07-.028-.19-.086-.354-.173-.164-.087-.367-.197-.597-.325-.23-.128-.48-.27-.734-.42-.254-.15-.504-.304-.737-.457-.233-.153-.44-.294-.61-.418-.17-.124-.298-.225-.378-.297-.08-.072-.114-.11-.114-.11s.055-.068.15-.18.225-.26.33-.425c.104-.165.233-.355.38-.56.147-.205.308-.42.475-.635.167-.215.333-.426.49-.623.158-.197.3-.377.42-.534.12-.157.214-.282.274-.368.06-.086.08-.12.05-.136-.03-.016-.092.01-.184.074-.092.064-.21.16-.35.28-.14.12-.3.264-.477.425-.177.161-.368.335-.565.515-.197.18-.395.36-.584.53-.189.17-.365.326-.52.46-.155.134-.28.237-.363.303-.083.066-.12.09-.104.068.016-.022.08-.088.184-.19.104-.102.24-.235.402-.39.162-.155.345-.33.54-.51.195-.18.396-.363.593-.538.197-.175.383-.338.55-.48.167-.142.31-.253.418-.325.108-.072.176-.1.192-.084.016.016-.012.05-.084.12-.072.07-.18.17-.32.295-.14.125-.305.27-.49.428-.185.158-.385.328-.59.5-.205.172-.41.34-.604.5-.194.16-.368.307-.518.435-.15.128-.27.228-.352.29-.082.062-.12.084-.102.06.018-.024.085-.098.196-.215.11-.117.255-.265.42-.435.165-.17.348-.35.538-.53.19-.18.38-.36.56-.528.18-.168.344-.318.487-.444.143-.126.257-.22.33-.274.073-.054.098-.06.062-.034a.76.76 0 0 1-.41.165c-.147.03-.284.04-.41.03a.52.52 0 0 1-.31-.075c-.104-.05-.173-.09-.202-.114-.03-.024-.02-.024.028-.062.048-.038.14-.11.27-.21.13-.1.29-.22.47-.354.18-.134.37-.27.56-.4s.37-.25.53-.358c.16-.108.3-.19.41-.242.11-.052.18-.072.2-.054.02.018-.02.06-.11.15-.09.09-.22.21-.38.35s-.34.29-.52.45c-.18.16-.36.32-.52.46-.16.14-.3.26-.41.35-.11.09-.18.14-.21.15-.03.01-.01.004.04-.032.05-.036.14-.1.26-.18.12-.08.26-.17.42-.26.16-.09.32-.17.48-.24.16-.07.3-.11.41-.12.11-.01.18.01.2.06.02.05-.02.13-.1.24-.08.11-.2.25-.34.4s-.3.32-.46.47c-.16.15-.32.3-.46.43-.14.13-.26.23-.34.3-.08.07-.11.09-.08.06Z" clip-rule="evenodd" /></svg>
+          Hot
+        </span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="flex flex-1 flex-col p-4 md:p-5">
+    <div class="mb-2 flex items-center text-xs text-gray-500">
+      <time datetime="{{ product.created_at|date:'c' }}">
+        {{ product.created_at|date:"M j, Y" }}
+      </time>
+      <span class="mx-2">•</span>
+      <span>{{ product.product_views }} views</span>
+    </div>
+
+    <h3 class="text-lg font-bold leading-tight text-gray-800">
+      <a href="{% url 'main:show_product' product.id %}" class="transition-colors hover:text-cyan-600">
+        <span class="absolute inset-0" aria-hidden="true"></span>
+        {{ product.name }}
+        
+      </a>
+      <p class="mt-1 text-base font-semibold text-green-900">
+        Rp.{{ product.price }}
+      </p>
+    </h3>
+
+    <p class="mt-2 text-sm text-gray-600 line-clamp-3">
+      {{ product.description|truncatewords:20 }}
+    </p>
+
+    <div class="mt-auto pt-4">
+      {% if user.is_authenticated and product.user == user %}
+        <div class="relative z-10 flex items-center justify-between text-sm">
+          <a href="{% url 'main:show_product' product.id %}" class="font-semibold text-cyan-600 transition-colors hover:text-cyan-700">
+          </a>
+          <div class="flex items-center space-x-4">
+            <a href="{% url 'main:edit_product' product.id %}" class="font-medium text-gray-600 transition-colors hover:text-blue-600">
+              Edit
+            </a>
+            <a href="{% url 'main:delete_product' product.id %}" class="font-medium text-gray-600 transition-colors hover:text-red-600">
+              Delete
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <div class="relative z-10 flex items-center text-sm font-semibold text-cyan-600 transition-colors group-hover:text-cyan-700">
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

@@ -212,3 +212,71 @@ Implementasi Autentikasi, Session, dan Cookies pada Django
         - login(request, user) yang berfungsi untuk melakukan login menggunakan sistem autentikasi Django.
         - response = HttpResponseRedirect(reverse("main:show_main")) yang akan menetapkan redirect ke halaman main setelah response diterima.
         - response.set_cookie('last_login', str(datetime.datetime.now())) yang berfungsi untuk mendaftarkan cookie last_login di response dengan isi timestamp terkini. Kemudian tambahkan 'last_login': request.COOKIES['last_login'] ke dalam context di function show_main. Dan modifikasi fungsi logout_user untuk menghapus cookie last_login setelah melakukan logout. Terakhir tambahkan tombol logout untuk menampilkan data waktu terakhir pengguna login di main.html.
+
+Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+
+
+    Urutan dari paling tinggi ke paling rendah
+    1. Inline styles (semua yang didalam style tag)
+    2. ID selectors
+    3. Classes selector
+    4. Element selector
+
+    Contoh:
+        ...
+        <h1 class="class1" style="color: red;" id="title1">HTML5 Example Page</h1> (Inline: prioritas 1, warna merah)
+        ...
+        style.css
+        h1 {
+        color: blue; (Element: prioritas 4, warna biru)
+        }
+        #title1 {
+        color: aqua; (ID: prioritas 2, warna aqua)
+        }
+        .class1 {
+        color: cadetblue; (Class: prioritas 3, warna cadetblue)
+        }
+
+    Ketika prioritas 1 tidak ada maka yang akan diambil adalah prioritas 2. Jika prioritas 2 tidak ada maka yang akan diambil adalah prioritas 3, dst.
+
+Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design, serta jelaskan mengapa!
+
+    Responsive design perlu diterapkan dalam pengembangan aplikasi web karena pengguna tidak hanya mengakses aplikasi melalui satu perangkat tetapi dari berbagai perangkat yang berbeda beda seperti, desktop, tablet, smartphone tentu perangkat tersebut memiliki ukuran layar, orientasi, dan resolusi yang berbeda. Tanpa responsive design, tampilan web akan berantakan, sulit dinavigasi, dan menurunkan pengalaman pengguna. Terdapat framework seperti Bootstrap  untuk membangun situs mobile-first dan responsive. Contoh aplikasi yang sudah menerapkan responsive design adalah  YouTube. Pada aplikasi mobile, YouTube memiliki navigation bar pada bagian bawah perangkat (misal, ketika menggunakan aplikasi YouTube lewat iPad), tetapi ketika YouTube dibuka lewat chrome menggunakan laptop, maka navigation bar berada di samping kiri layar dan terdapat logo garis tiga untuk meng-expand navigation bar. Contoh aplikasi yang belum menerapkan responsive design adalah https://www.websitesekolahgratis.web.id/. Ketika kita membuka website tersebut menggunakan handphone maka tulisan akan terlihat sangat kecil, karena design tidak menyesuaikan perangkat, tentu jelas berbeda ketika dibuka melalui desktop. Halaman akan tetap terlihat rapih.
+
+Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+
+    Padding adalah ruang antara konten elemen dan border (gap antar konten dan border). Padding bisa di set untuk semua sisi sekaligus atau spesifik per sisi nya. 
+    Border adalah garis yang mengelilingi padding sebuah elemen. Border bisa diatur ketebalan, style (misalnya solid, putus-putus), dan warnanya. Kita bisa membuat border sekaligus (mengelilingi elemen) atau menargetkan sisi tertentu secara spesifik.
+    Margin adalah ruang transparan di luar border. Berfungsi untuk membuat jarak antara elemen tersebut dengan elemen lainnya pada suatu page. Jika padding memberi ruang di dalam kotak, margin memberi ruang di luar kotak. Sama seperti padding, margin bisa diatur untuk semua sisi atau per sisi.
+
+Jelaskan konsep flex box dan grid layout beserta kegunaannya! (interaktif)
+
+    Flexbox adalah model layout satu dimensi. bisa disusun berjajar ke samping (baris) atau ditumpuk ke atas (kolom), tetapi tidak keduanya sekaligus dalam satu aturan. Flexbox cukup fleksibel sehingga model ini sangat ideal untuk perataan, pengurutan, dan pendistribusian ruang di antara elemen dalam sebuah komponen perlu ditangani. Oleh karena itu, Flexbox sering diterapkan untuk komponen antarmuka berskala kecil, seperti navbar, galeri, atau kelompok tombol.
+    Grid Layout ditujukan untuk penataan dalam dua dimensi, yaitu baris dan kolom secara bersamaan. Dengan Grid, sebuah struktur kisi-kisi yang presisi dapat didefinisikan untuk seluruh halaman, sehingga elemen-elemen besar seperti header, sidebar, dan area konten utama dapat diletakkan sesuai dengan keinginan dan tetap konsisten. Grid cukup diandalkan ketika ingin membuat sebuah tata letak halaman yang kompleks dan terstruktur. Pada praktiknya, kedua model ini sering digabungkan, di mana layout makro sebuah halaman disusun oleh Grid, sementara komponen-komponen di dalamnya dirapikan menggunakan Flexbox.
+
+Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial)!
+    Implementasikan fungsi untuk menghapus dan mengedit product.
+    Pertama, membuat fungsi edit_product dan delete_product di views.py. Kemudian, buat file edit_news.html pada subdirektori main/templates untuk tampilan edit_product. Selanjutnya, import fungsi yang dibuat sebelumnya dan daftarkan url pattern pada urlpatterns di urls.py. Tambahkan tombol Edit dan Delete di edit_product.html dan card_product.html.
+
+    Kustomisasi desain pada template HTML
+    Menggunakan CSS untuk kustomisasi, ada 3 cara yaitu Inline style, Internal style sheet, dan External style sheet. Kemudian untuk merubah tampilan elemen tertentu, gunakan selector CSS (perlu diingat bahwa ada prioritas dalam memandang selector). Kemudian jangan lupa untuk integrasaikan pada django (menggunakan global.css)
+
+    Kustomisasi halaman login, register, tambah product, edit product, dan detail product.
+    Saya mengubah warna, bentuk, dan beberapa kalimat dari template yang disediakan pada tutorial. Warna tombol saya ubah dari hijau menjadi cyan dengan beberapa shade berbeda. Saya juga menambahkan hover transition color agar user bisa lebih jelas melihat tombol yang ingin di klik. Kemudian bentuk box-box yang tadinya tumpul saya jadikan block untuk mendapatkan hasil kotak agar lebih minimalis dan tegas. Untuk ini gunakan base template (base.html) agar navbar, CSS global, dan script bisa dipakai ulang.
+
+    Kustomisasi halaman daftar product 
+        Untuk menampilkan static files seperti gambar perlu diatur pada settings.py. Disini saya mengikuti tutorial untuk pengaturannya. Kemudian untuk menampilkan card dari product (jika product ada) buat html untuk card_product kemudian sambungkan dengan main.html. Saya pribadi mengubah style dari card dari tutorial sebelumnya dengan melakukan pengubahan warna pada tampilan kategori, kemudian bentuk tampilan yang tajam (block) kemudian untuk detail produk bisa dilihat dengan meng-klik block produk yang ingin dillihat tanpa menggunakan read more. 
+
+    Pada tiap card product, buatlah dua buah button untuk mengedit dan menghapus product pada card tersebut
+    Tambahkan tag <a> </a> yang berisi button yang ingin dibuat, dalam hal ini edit dan delete. Tambahkan pada card product agar tombol terlihat pada card
+
+    Membuat navigation bar (navbar) untuk fitur-fitur pada aplikasi yang responsive terhadap perbedaan ukuran device, khususnya mobile dan desktop
+    Saya menambahkan kategori navigation baru seperti women, men, kids, dan equipment yang mana merupakan kategori dari suatu produk yang sudah didefiniskan pada models.py. Hal ini dilakukan dengan menambahkan filter baru pada show_main dan menambahkan :
+    untuuk tampilan desktop:
+     <a href="{% url 'main:show_main' %}?filter={{ current_user_filter }}&category=[category nya]" class="text-gray-300 hover:text-white font-medium transition-colors"> [Nama pada Navbar]
+          </a> 
+    untuuk tampilan mobile:
+    <a href="{% url 'main:show_main' %}?filter={{ current_user_filter }}&category=[category nya]" class="block text-gray-300 hover:text-white font-medium py-3 transition-colors"> [Nama pada Navbar]
+          </a>
+    pada navbar.html. sisanya mirip dengan yang ada pada tutorial
+    

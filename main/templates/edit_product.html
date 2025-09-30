@@ -1,6 +1,8 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
+{% load static %}
+
 {% block meta %}
-<title>Create Product - Activia Goodz</title>
+<title>Edit Product - Activia Goodz</title>
 {% endblock meta %}
 
 {% block content %}
@@ -15,10 +17,10 @@
     </div>
     
     <!-- Form -->
-    <div class="bg-white block border border-gray-200 p-6 sm:p-8 form-style">
+    <div class="bg-white block-lg border border-gray-200 p-6 sm:p-8 form-style">
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">Create New Product</h1>
-        <p class="text-gray-600">Share your product!</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Edit Product</h1>
+        <p class="text-gray-600">Update your product!</p>
       </div>
       
       <form method="POST" class="space-y-6">
@@ -45,12 +47,11 @@
             Cancel
           </a>
           <button type="submit" class="order-1 sm:order-2 flex-1 bg-cyan-600 text-white px-6 py-3 block-md font-medium hover:bg-cyan-700 transition-colors">
-            Publish Product
+            Update Product
           </button>
         </div>
       </form>
     </div>
   </div>
 </div>
-
 {% endblock %}

@@ -1,64 +1,74 @@
 <!--menggunakan base.html sebagai template utama.-->
 {% extends 'base.html' %} 
+{% load static %}
+
+{% block meta %}
+<title>Activia Goodz</title>
+{% endblock meta %}
+
 {% block content %}
-<h1>Activia Goodz</h1>
+{% include 'navbar.html' %}
+<div class="bg-gray-50 w-full pt-16 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-<h5>NPM: </h5>
-<p>{{ npm }}</p>
+    <!-- Header Section -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold italic text-gray-900 mb-2">Goodz.</h1>
+      <p class="text-3xl font-bold text-gray-600 mb-2">The easiest way to get what you love.</p>
+    </div>
 
-<h5>Name: </h5>
-<p>{{ name }}<p>
+    <!-- Filter Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-white block-lg border border-gray-200 p-4">
+      <div class="flex space-x-3 mb-4 sm:mb-0">
+        
+        <a href="{% url 'main:show_main' %}?filter=all" 
+           class="px-4 py-2 block-md font-medium transition-colors hover:bg-cyan-600 hover:text-white
+                  {% if current_user_filter == 'all' %}
+                    bg-gray-800 text-white
+                  {% else %}
+                    bg-white text-gray-700 border border-gray-300
+                  {% endif %}">
+          All
+        </a>
+        
+        <a href="{% url 'main:show_main' %}?filter=my_products" 
+           class="px-4 py-2 block-md font-medium transition-colors hover:bg-cyan-600 hover:text-white
+                  {% if current_user_filter == 'my_products' %}
+                    bg-gray-800 text-white
+                  {% else %}
+                    bg-white text-gray-700 border border-gray-300
+                  {% endif %}">
+          My Product
+        </a>
 
-<h5>Class: </h5>
-<p>{{ class }}</p>
+      </div>
+      {% if user.is_authenticated %}
+        <div class="text-sm text-gray-500">
+          Last login: {{ last_login }}
+        </div>
+      {% endif %}
+    </div>
 
-<a href="{% url 'main:create_product' %}">
-  <button>+ Add Product</button>
-</a>
-
-<a href="{% url 'main:logout' %}">
-  <button>Logout</button>
-</a>
-
-<h5>Sesi terakhir login: {{ last_login }}</h5>
-
-<hr>
-
-<a href="?filter=all">
-    <button type="button">All Products</button>
-</a>
-<a href="?filter=my">
-    <button type="button">My Products</button>
-</a> 
-
-{% if not products_list %}
-<p>Belum ada data produk pada Activia Goodz.</p>
-{% else %}
-
-{% for product in products_list %}
-<div>
-  <h2><a href="{% url 'main:show_product' product.id %}">{{ product.name }}</a></h2>
-
-  <p><b>{{ product.get_category_display }}</b>
-    {% if product.is_featured %} | <b>Featured</b>{% endif %}
-    {% if product.is_product_hot %} | <b>Hot</b>{% endif %}
-    | <i>{{ product.created_at|date:"d M Y H:i" }}</i> 
-    | Views: {{ product.product_views }}
-  </p>
-
-  {% if product.thumbnail %}
-    <img src="{{ product.thumbnail }}" alt="thumbnail" width="150" height="100">
-    <br />
-  {% endif %}
-
-  <p>{{ product.description|truncatewords:25 }}...</p>
-
-  <p><a href="{% url 'main:show_product' product.id %}"><button>Read More</button></a></p>
+    <!-- Product Grid -->
+    {% if not products_list %}
+      <div class="bg-white block-lg border border-gray-200 p-12 text-center">
+        <div class="w-32 h-32 mx-auto mb-4">
+          <img src="{% static 'image/no-product(1).png' %}" alt="No product available" class="w-full h-full object-contain">
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Sorry, no matches were found.</h3>
+        <p class="text-gray-500 mb-6">Bring your products to the game. Add them now.</p>
+        <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 bg-cyan-600 text-white block-md hover:bg-cyan-700 transition-colors">
+          Create Product
+        </a>
+      </div>
+    {% else %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for product in products_list %}
+          {% include 'card_product.html' with product=product %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
 </div>
-
-<hr>
-{% endfor %}
-
-{% endif %}
 
  {% endblock content %}
