@@ -14,6 +14,7 @@ from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
 import json
 from django.contrib.auth.models import User
+import re
 
 # Create your views here.
 @login_required(login_url='/login')
@@ -51,7 +52,7 @@ def show_product(request, id):
 
 def show_xml(request):
     products_list = Product.objects.all()
-    xml_data = serializers.serialize("xml", products_list) # serializer berguna untuk extract data nya
+    xml_data = serializers.serialize("xml", products_list)
     return HttpResponse(xml_data, content_type="application/xml")
 
 def show_json(request):
@@ -222,8 +223,9 @@ def login_ajax(request):
             'message': 'Invalid JSON format'
         }, status=400)
 
-    username = data.get('username', '')
-    password = data.get('password', '')
+    # Sanitize dan validasi input
+    username = strip_tags(data.get('username', '')).strip()
+    password = strip_tags(data.get('password', '')).strip()
 
     # Validasi input tidak kosong
     if not username or not password:
@@ -233,10 +235,23 @@ def login_ajax(request):
         }, status=400)
 
     # Batasi panjang input untuk mencegah abuse
-    if len(username) > 150 or len(password) > 128:
+    if len(username) > 150:
         return JsonResponse({
             'status': 'error', 
-            'message': 'Input too long'
+            'message': 'Username is too long'
+        }, status=400)
+    
+    if len(password) > 128:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Password is too long'
+        }, status=400)
+
+    # Validasi karakter username (hanya huruf, angka, underscore)
+    if not re.match(r'^[\w]+$', username):
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Username can only contain letters, numbers, and underscores'
         }, status=400)
 
     # Autentikasi user
@@ -247,7 +262,8 @@ def login_ajax(request):
         response_data = {
             'status': 'success',
             'message': 'Login successful',
-            'redirect_url': reverse('main:show_main')
+            'redirect_url': reverse('main:show_main'),
+            'username': user.username
         }
         response = JsonResponse(response_data)
         response.set_cookie('last_login', str(datetime.datetime.now()))
@@ -269,15 +285,36 @@ def register_ajax(request):
             'message': 'Invalid JSON format'
         }, status=400)
 
-    username = data.get('username', '')
-    password1 = data.get('password1', '')
-    password2 = data.get('password2', '')
+    # Sanitize semua input
+    username = strip_tags(data.get('username', '')).strip()
+    password1 = strip_tags(data.get('password1', '')).strip()
+    password2 = strip_tags(data.get('password2', '')).strip()
 
     # Validasi input tidak kosong
     if not username or not password1 or not password2:
         return JsonResponse({
             'status': 'error', 
             'message': 'All fields are required'
+        }, status=400)
+
+    # Validasi panjang username
+    if len(username) < 3:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Username must be at least 3 characters long'
+        }, status=400)
+    
+    if len(username) > 150:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Username is too long (max 150 characters)'
+        }, status=400)
+
+    # Validasi karakter username (hanya huruf, angka, underscore)
+    if not re.match(r'^[\w]+$', username):
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Username can only contain letters, numbers, and underscores'
         }, status=400)
 
     # Validasi password cocok
@@ -293,19 +330,11 @@ def register_ajax(request):
             'status': 'error', 
             'message': 'Password must be at least 8 characters long'
         }, status=400)
-
-    # Validasi panjang username
-    if len(username) > 150:
+    
+    if not re.search(r'[A-Za-z]', password1) or not re.search(r'[0-9]', password1):
         return JsonResponse({
             'status': 'error', 
-            'message': 'Username too long'
-        }, status=400)
-
-    # Validasi karakter username (opsional tapi direkomendasikan)
-    if not username.isalnum() and '_' not in username:
-        return JsonResponse({
-            'status': 'error', 
-            'message': 'Username can only contain letters, numbers, and underscores'
+            'message': 'Password must contain both letters and numbers'
         }, status=400)
 
     # Cek apakah username sudah ada
@@ -323,7 +352,8 @@ def register_ajax(request):
         return JsonResponse({
             'status': 'success',
             'message': 'Registration successful',
-            'redirect_url': reverse('main:login')
+            'redirect_url': reverse('main:login'),
+            'username': username
         })
     except Exception as e:
         return JsonResponse({

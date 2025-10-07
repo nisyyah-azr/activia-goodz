@@ -334,7 +334,14 @@ Keuntungan menggunakan AJAX dibandingkan render biasa di Django
     3. Fitur-fitur bawaan dari AJAX: AJAX memiliki fitur-fitur yang tidak dimiliki render biasa, seperti real-time notifications yang muncul tanpa refresh, live form validation dimana error messages muncul instantly saat pengguna mengetik, bukan setelah submit dan inline editing dimana pengguna bisa edit data langsung di table tanpa membuka form terpisah. 
 
 Cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django
-    Banyak cara yang dapat dilakukan seperti CSRF Protection, Input Validation, menggunakan https saat deploy dsb. Tapi pada projek kali ini saya menggunakan Input Validation untuk memastikan bahwa input sesuai dengan ketentuan. 
+    Banyak cara yang dapat dilakukan seperti CSRF Protection, Input Validation, menggunakan https saat deploy dsb. Kita bisa menerapkan beberapa lapisan keamanan untuk melindungi dari serangan umum seperti CSRF, XSS, dan injection attacks.
+    Metode yang diimplementasikan pada projek ini:
+        1. CSRF Protection: Token CSRF disertakan dalam form menggunakan {% csrf_token %} dan diekstrak dari cookie melalui fungsi getCookie(). Token dikirimkan via header X-CSRFToken pada setiap AJAX request. 
+        2. XSS Prevention: Sanitasi dilakukan dua lapis menggunakan DOMPurify di client-side dengan DOMPurify.sanitize() untuk membersihkan input sebelum dikirim, dan strip_tags() di server-side untuk menghilangkan tag HTML. 
+        3. Input Validation: Validasi client-side memeriksa field kosong, password matching, dan panjang minimal. Server-side validation menggunakan regex re.match(r'^[\w]+$', username) untuk memastikan username hanya alfanumerik dan underscore (3-150 karakter). Password divalidasi minimal 8 karakter dengan kombinasi huruf dan angka menggunakan re.search(). Username yang sudah ada diperiksa via query database
+        4. Secure Error Handling: Error dikembalikan dengan JsonResponse berstruktur konsisten dan HTTP status code tepat (400, 401, 500). Pesan error generik seperti "Invalid username or password" mencegah username enumeration. Exception ditangkap dalam try-catch block untuk mencegah stack trace terekspos.
+
+ 
 
 Pengaruh AJAX terhadap pengalaman user (User Experience) pada website
 

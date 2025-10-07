@@ -20,14 +20,17 @@
         </div>
 
         <form id="registerForm" class="space-y-5">
+          {% csrf_token %}
           <div>
             <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
             <input id="username" name="username" type="text" required class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cyan-500 transition duration-200" placeholder="Choose a username">
+            <p class="mt-1 text-xs text-gray-500">Only letters, numbers, and underscores allowed</p>
           </div>
 
           <div>
             <label for="password1" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input id="password1" name="password1" type="password" required class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cyan-500 transition duration-200" placeholder="Create a password">
+            <p class="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
           </div>
 
           <div>
@@ -35,7 +38,7 @@
             <input id="password2" name="password2" type="password" required class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-cyan-500 transition duration-200" placeholder="Confirm your password">
           </div>
 
-          <button type="submit" class="w-full bg-cyan-600 text-white font-medium py-3 px-4 rounded hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition duration-200">
+          <button type="submit" id="submitButton" class="w-full bg-cyan-600 text-white font-medium py-3 px-4 rounded hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition duration-200">
             Create Account
           </button>
         </form>
@@ -52,19 +55,73 @@
 </div>
 
 <script>
+// Fungsi untuk mendapatkan CSRF token dari cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 document.getElementById('registerForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const username = document.getElementById('username').value;
-    const password1 = document.getElementById('password1').value;
-    const password2 = document.getElementById('password2').value;
+    const submitButton = document.getElementById('submitButton');
+    const originalButtonText = submitButton.textContent;
+    
+    // Disable button dan ubah teks
+    submitButton.disabled = true;
+    submitButton.textContent = 'Creating account...';
+    
+    // Sanitize input menggunakan DOMPurify
+    const username = DOMPurify.sanitize(document.getElementById('username').value.trim());
+    const password1 = DOMPurify.sanitize(document.getElementById('password1').value.trim());
+    const password2 = DOMPurify.sanitize(document.getElementById('password2').value.trim());
     const errorDiv = document.getElementById('error-message');
+    const csrftoken = getCookie('csrftoken');
+    
+    // Validasi client-side
+    if (!username || !password1 || !password2) {
+        errorDiv.querySelector('div').textContent = 'All fields are required';
+        errorDiv.classList.remove('hidden');
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
+        showToast('Validation Error', 'All fields are required', 'error', 3000);
+        return;
+    }
+    
+    if (password1 !== password2) {
+        errorDiv.querySelector('div').textContent = 'Passwords do not match';
+        errorDiv.classList.remove('hidden');
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
+        showToast('Validation Error', 'Passwords do not match', 'error', 3000);
+        return;
+    }
+    
+    if (password1.length < 8) {
+        errorDiv.querySelector('div').textContent = 'Password must be at least 8 characters long';
+        errorDiv.classList.remove('hidden');
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
+        showToast('Validation Error', 'Password must be at least 8 characters', 'error', 3000);
+        return;
+    }
     
     try {
         const response = await fetch("{% url 'main:register_ajax' %}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
             },
             body: JSON.stringify({
                 username: username,
@@ -76,15 +133,52 @@ document.getElementById('registerForm').addEventListener('submit', async functio
         const data = await response.json();
         
         if (response.ok && data.status === 'success') {
-            window.location.href = data.redirect_url;
+            // Sanitize redirect URL untuk keamanan
+            const sanitizedUrl = DOMPurify.sanitize(data.redirect_url);
+            
+            // Tampilkan toast sukses
+            showToast('Registration Successful!', `Welcome, ${username}! Please login to continue.`, 'success', 2000);
+            
+            // Redirect setelah delay
+            setTimeout(() => {
+                window.location.href = sanitizedUrl;
+            }, 1500);
         } else {
-            errorDiv.querySelector('div').textContent = data.message;
+            // Sanitize error message sebelum ditampilkan
+            const sanitizedMessage = DOMPurify.sanitize(data.message);
+            errorDiv.querySelector('div').textContent = sanitizedMessage;
             errorDiv.classList.remove('hidden');
+            
+            // Tampilkan toast error
+            showToast('Registration Failed', sanitizedMessage, 'error', 3000);
+            
+            // Re-enable button
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
         }
     } catch (error) {
-        errorDiv.querySelector('div').textContent = 'An error occurred. Please try again.';
+        const errorMessage = 'An error occurred. Please try again.';
+        errorDiv.querySelector('div').textContent = errorMessage;
         errorDiv.classList.remove('hidden');
+        
+        // Tampilkan toast error
+        showToast('Error', errorMessage, 'error', 3000);
+        
+        // Re-enable button
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
     }
+});
+
+// Hide error message when user starts typing
+document.getElementById('username').addEventListener('input', function() {
+    document.getElementById('error-message').classList.add('hidden');
+});
+document.getElementById('password1').addEventListener('input', function() {
+    document.getElementById('error-message').classList.add('hidden');
+});
+document.getElementById('password2').addEventListener('input', function() {
+    document.getElementById('error-message').classList.add('hidden');
 });
 </script>
 
