@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="group relative flex flex-col overflow-hidden border border-gray-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+<div class="group relative flex flex-col overflow-hidden border border-gray-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
   
   <div class="aspect-video relative overflow-hidden">
     <a href="{% url 'main:show_product' product.id %}" class="block w-full h-full">
@@ -16,14 +16,14 @@
     </a>
 
     <div class="absolute top-3 left-3">
-      <span class="inline-block bg-cyan-600/90 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+      <span class="inline-block bg-gray-600/90 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
         {{ product.get_category_display }}
       </span>
     </div>
 
     <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
       {% if product.is_featured %}
-        <span class="inline-flex items-center gap-x-1.5 block bg-blue-100/80 px-2 py-1 text-xs font-medium text-blue-700 backdrop-blur-sm">
+        <span class="inline-flex items-center gap-x-1.5 block bg-gray-100/80 px-2 py-1 text-xs font-medium text-gray-700 backdrop-blur-sm">
           <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c.321-.772 1.305-.772 1.626 0l1.823 4.416 4.862.707c.85.124 1.188 1.166.574 1.765l-3.518 3.428.83 4.843c.145.845-.743 1.492-1.503 1.09L10 16.59l-4.347 2.284c-.76.402-1.648-.245-1.503-1.09l.83-4.843L1.462 9.772c-.614-.6-.276-1.641.574-1.765l4.863-.707L8.72 2.884z" clip-rule="evenodd" /></svg>
           Featured
         </span>
@@ -47,13 +47,13 @@
     </div>
 
     <h3 class="text-lg font-bold leading-tight text-gray-800">
-      <a href="{% url 'main:show_product' product.id %}" class="transition-colors hover:text-cyan-600">
+      <a href="{% url 'main:show_product' product.id %}" class="transition-colors hover:text-gray-600">
         <span class="absolute inset-0" aria-hidden="true"></span>
         {{ product.name }}
         
       </a>
-      <p class="mt-1 text-base font-semibold text-green-900">
-        Rp.{{ product.price }}
+      <p class="mt-1 text-base font-semibold text-gray-900">
+        Rp {{ product.price }}
       </p>
     </h3>
 
@@ -64,10 +64,10 @@
     <div class="mt-auto pt-4">
       {% if user.is_authenticated and product.user == user %}
         <div class="relative z-10 flex items-center justify-between text-sm">
-          <a href="{% url 'main:show_product' product.id %}" class="font-semibold text-cyan-600 transition-colors hover:text-cyan-700">
+          <a href="{% url 'main:show_product' product.id %}" class="font-semibold text-gray-600 transition-colors hover:text-gray-700">
           </a>
           <div class="flex items-center space-x-4">
-            <a href="{% url 'main:edit_product' product.id %}" class="font-medium text-gray-600 transition-colors hover:text-blue-600">
+            <a href="{% url 'main:edit_product' product.id %}" class="font-medium text-gray-600 transition-colors hover:text-gray-800">
               Edit
             </a>
             <a href="{% url 'main:delete_product' product.id %}" class="font-medium text-gray-600 transition-colors hover:text-red-600">
@@ -76,7 +76,7 @@
           </div>
         </div>
       {% else %}
-        <div class="relative z-10 flex items-center text-sm font-semibold text-cyan-600 transition-colors group-hover:text-cyan-700">
+        <div class="relative z-10 flex items-center text-sm font-semibold text-gray-600 transition-colors group-hover:text-gray-700">
         </div>
       {% endif %}
     </div>

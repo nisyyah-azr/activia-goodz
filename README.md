@@ -4,6 +4,9 @@ Kelas : PBP A
 
 https://nisyyah-azzahra-activiagoodz.pbp.cs.ui.ac.id/
 
+===== TUGAS 2 =====
+
+
 Cara mengimplementasikan checklist secara step-by-step
 Membuat sebuah proyek Django baru:
 
@@ -129,6 +132,9 @@ Alasan mengapa framework Django dijadikan permulaan pembelajaran pengembangan pe
 
 Feedback untuk asisten dosen: Tidak ada, sudah cukup puas dengan mekanisme pengerjaan dan hasil tutorial 1
 
+===== TUGAS 3 =====
+
+
 Data delivery dalam pengimplementasian sebuah platform
 Data delivery tentu sangat diperlukan dalam pengimplementasian sebuah platform terutama untuk integrasi. Integrasi antar sistem pada suatu platform biasanya terdiri dari berbagai komponen yang perlu berkomunikasi. Data delivery berfungsi sebagai jembatan yang memungkinkan pertukaran informasi yang seamless antar sistem ini. Diantara manfaat lainnya adalah kita bisa mengakses data secara real-time secara sinkronus maupun asinkronus dengan data yang konsisten. Tanpa mekanisme data delivery, bisa terjadi ketidakkonsistenan data antara fitur yang berbeda, yang dapat menyebabkan error atau pengalaman pengguna yang buruk.
 
@@ -163,6 +169,9 @@ Cara mengimplementasikan checklist secara step-by-step
 screenshot hasil akses URL pada Postman:
 ristek.link/screenshot-Postman-NA
 backup link: https://drive.google.com/drive/u/0/folders/1J2ngWYLCyYoxhXoLfzPom5lo34Sv5n2A 
+
+===== TUGAS 4 =====
+
 
 Django AuthenticationForm
 (kelebihan dan kekurangannya)
@@ -212,6 +221,9 @@ Implementasi Autentikasi, Session, dan Cookies pada Django
         - login(request, user) yang berfungsi untuk melakukan login menggunakan sistem autentikasi Django.
         - response = HttpResponseRedirect(reverse("main:show_main")) yang akan menetapkan redirect ke halaman main setelah response diterima.
         - response.set_cookie('last_login', str(datetime.datetime.now())) yang berfungsi untuk mendaftarkan cookie last_login di response dengan isi timestamp terkini. Kemudian tambahkan 'last_login': request.COOKIES['last_login'] ke dalam context di function show_main. Dan modifikasi fungsi logout_user untuk menghapus cookie last_login setelah melakukan logout. Terakhir tambahkan tombol logout untuk menampilkan data waktu terakhir pengguna login di main.html.
+
+===== TUGAS 5 =====
+
 
 Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
 
@@ -286,4 +298,70 @@ Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-b
         <a href="{% url 'main:show_main' %}?filter={{ current_user_filter }}&category=[category nya]" class="block text-gray-300 hover:text-white font-medium py-3 transition-colors"> [Nama pada Navbar]
             </a>
     pada navbar.html. sisanya mirip dengan yang ada pada tutorial
+
+===== TUGAS 6 =====
+
+
+Perbedaan antara synchronous request dan asynchronous request
+
+    Synchronous request di web menyebabkan ketika user mengklik tombol atau mengirim form, browser mengirim request ke server dan kemudian "pause" - menunggu response dari server. Selama waktu tunggu ini, user tidak bisa berinteraksi dengan halaman. Mereka hanya melihat loading spinner atau halaman kosong. Setelah server mengirim response, seluruh halaman dimuat ulang dari awal. Ini menciptakan pengalaman yang disebut "click-wait-refresh" - klik tombol, tunggu, lalu halaman refresh. Setiap kali user ingin melihat data baru atau mengirim informasi, seluruh siklus ini berulang.
+    Sebaliknya, pada asynchronous request ketika user melakukan aksi, JavaScript mengirim request ke server di background. user tetap bisa scroll halaman, mengklik elemen lain, atau membaca konten yang ada. Ketika server mengirim response, JavaScript menerima data tersebut dan hanya mengupdate bagian tertentu dari halaman yang perlu diubah, tanpa me-reload seluruh halaman. Pengalaman menjadi jauh lebih smooth dan responsif.
+    Perbedaan ini memiliki implikasi besar pada user experience. Dengan synchronous request, setiap interaksi terasa lambat dan mengganggu alur kerja pengguna. Dengan asynchronous request menggunakan AJAX, aplikasi web terasa modern, cepat, dan responsif, memberikan pengalaman yang jauh lebih menyenangkan.
+
+Cara AJAX bekerja di Django (alur request–response)
+
+    1. Event Trigger: Terjadi event di web page (misalnya user mengklik tombol, submit form, atau halaman dimuat)
+    2. Pembuatan Request: JavaScript membuat XMLHttpRequest object atau menggunakan Fetch API untuk mengirim HTTP request ke server Django
+    3. Request ke Server: Request dikirim ke URL endpoint Django tertentu (biasanya ke view function/class-based view)
+    4. Processing di Server:
+        - Django view menerima request
+        - Memproses data (query database, validasi, logic bisnis)
+        - Menyiapkan response dalam format JSON/XML/HTML
+    5. Response dari Server: Server Django mengirim response kembali ke browser dalam format yang diminta (biasanya JSON)
+    6. JavaScript Processing:
+        - JavaScript menerima response
+        - Parse data (jika JSON: JSON.parse())
+        - Manipulasi DOM untuk update tampilan
+    7. Update UI: Halaman di-update tanpa reload penuh - hanya bagian tertentu yang berubah
+
+Keuntungan menggunakan AJAX dibandingkan render biasa di Django
+
+    1. Transfer data: Dalam render biasa, server mungkin mengirim 200-300 KB HTML yang berisi markup lengkap untuk seluruh page. Dengan AJAX, server hanya mengirim 5-10 KB data JSON yang murni berisi informasi produk. Ini berarti transfer 20-30 kali lebih cepat, terutama penting untuk pengguna dengan koneksi internet lambat atau mobile data yang terbatas.
+    Dari sisi server load, rendering template HTML adalah operasi yang cukup expensive secara komputasi. Django harus memproses template, mengisi semua variabel, menjalankan template tags dan filters, dan menghasilkan string HTML yang lengkap. Dengan AJAX, server hanya perlu serialize data ke JSON, yang jauh lebih cepat dan ringan. Ini berarti server bisa handle lebih banyak requests secara bersamaan dengan resource yang sama.
+
+    2. User experience (UX): Dengan render biasa, ketika user meng-klik sesuatu ia harus menunggu untuk buka halaman baru. Dengan AJAX, user bisa melakukan multiple actions secara bersamaan. Misalnya, dalam penggunaan e-commerce sambil menunggu hasil search dimuat, user bisa scroll melihat featured products, atau menambahkan item lain ke cart.
     
+    3. Fitur-fitur bawaan dari AJAX: AJAX memiliki fitur-fitur yang tidak dimiliki render biasa, seperti real-time notifications yang muncul tanpa refresh, live form validation dimana error messages muncul instantly saat pengguna mengetik, bukan setelah submit dan inline editing dimana pengguna bisa edit data langsung di table tanpa membuka form terpisah. 
+
+Cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django
+    Banyak cara yang dapat dilakukan seperti CSRF Protection, Input Validation, menggunakan https saat deploy dsb. Tapi pada projek kali ini saya menggunakan Input Validation untuk memastikan bahwa input sesuai dengan ketentuan. 
+
+Pengaruh AJAX terhadap pengalaman user (User Experience) pada website
+
+    A. Responsiveness & Speed
+        - Instant Feedback: User bisa mendapat respons lebih cepat tanpa perlu menunggu full page reload
+        - Perceived Performance: Aplikasi terasa lebih cepat meskipun actual load time mungkin sama
+        - Reduced Loading Time: Hanya data yang diperlukan yang di-transfer, bukan seluruh halaman
+
+    B. Interactivity
+        - Real-time Updates: Data dapat di-update secara real-time tanpa user action (auto-refresh)
+        - Smooth Interactions: Animasi dan transisi lebih smooth tanpa page jump
+        - Continuous Workflow: User tidak kehilangan konteks atau posisi scroll saat melakukan aksi
+
+    C. Better Engagement
+        - Form Validation: Validasi real-time saat user mengetik (instant feedback)
+        - Autocomplete: Suggestions muncul saat user mengetik tanpa reload
+        - Infinite Scroll: Content loading lebih natural seperti social media feeds
+        - Live Search: Hasil search muncul langsung tanpa submit form
+
+    D. Context Preservation
+        - No State Loss: User tidak kehilangan data yang sudah diinput saat terjadi error
+        - Scroll Position: Posisi scroll tetap terjaga
+        - Form Data: Data form tidak hilang saat validasi gagal
+
+    E. Modern App Feel
+        - Native-like Experience: Web app terasa seperti native mobile/desktop app
+        - Progressive Enhancement: Dapat menambah fitur advanced tanpa mengganggu user yang tidak support
+        - Rich Interactions: Drag-and-drop, inline editing, dll
+
+    AJAX secara fundamental mengubah user experience dari static, page-based interaction menjadi dynamic, app-like experience. AJAX membuat aplikasi web terasa cepat, responsive, dan modern. Namun, implementasi harus dilakukan dengan penuh pertimbangan untuk akesibilitas, network reliability, dan error handling yang baik untuk memastikan pengalaman terbaik untuk semua user.

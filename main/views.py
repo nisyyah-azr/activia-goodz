@@ -1,45 +1,29 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from main.forms import ProductForm
 from main.models import Product
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core import serializers
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import datetime
-from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils.html import strip_tags
+import json
+from django.contrib.auth.models import User
 
 # Create your views here.
 @login_required(login_url='/login')
 def show_main(request):
-    user_filter = request.GET.get('filter')
-
-    if user_filter == 'my_products':
-        # Jika user memilih "My Products"
-        products_list = Product.objects.filter(user=request.user)
-    else:
-        # Defaultnya adalah "All Products"
-        products_list = Product.objects.all()
-    
-    # Kedua, tambahkan filter kategori di atas hasil sebelumnya
-    category_filter = request.GET.get('category')
-    
-    if category_filter:
-        # Filter Lanjutan: dari produk yang sudah ada, saring lagi berdasarkan kategori
-        products_list = products_list.filter(category=category_filter)
-
     context = {
-        'npm'               : '2406495823',
-        'name'              : request.user.username,
-        'class'             : 'PBP A',
-        'products_list'     : products_list,
-        'last_login'        : request.COOKIES.get('last_login', 'Never'),
-        'current_category'  : category_filter,
-        'current_user_filter': user_filter or 'all', 
+        'npm': '2406495823',
+        'name': request.user.username,
+        'class': 'PBP A',
+        'last_login': request.COOKIES.get('last_login', 'Never'),
     }
-
     return render(request, "main.html", context)
 
 def create_product(request):
@@ -71,9 +55,34 @@ def show_xml(request):
     return HttpResponse(xml_data, content_type="application/xml")
 
 def show_json(request):
-    products_list = Product.objects.all()
-    json_data = serializers.serialize("json", products_list) # serializer berguna untuk extract data nya
-    return HttpResponse(json_data, content_type="application/json")
+    user_filter = request.GET.get('filter')
+    category_filter = request.GET.get('category')
+    
+    if user_filter == 'my_products':
+        products_list = Product.objects.filter(user=request.user)
+    else:
+        products_list = Product.objects.all()
+    
+    if category_filter:
+        products_list = products_list.filter(category=category_filter)
+    
+    data = [
+        {
+            'id': str(product.id),
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'category': product.category,
+            'thumbnail': product.thumbnail,
+            'product_views': product.product_views,
+            'created_at': product.created_at.isoformat() if product.created_at else None,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+        }
+        for product in products_list
+    ]
+    
+    return JsonResponse(data, safe=False)
 
 def show_xml_by_id(request, product_id):
    try:
@@ -84,14 +93,27 @@ def show_xml_by_id(request, product_id):
        return HttpResponse(status=404)
 
 def show_json_by_id(request, product_id):
-   try:
-       product_item = Product.objects.get(pk=product_id)
-       json_data = serializers.serialize("json", [product_item])
-       return HttpResponse(json_data, content_type="application/json")
-   except Product.DoesNotExist:
-       return HttpResponse(status=404)
+    try:
+        product = Product.objects.get(pk=product_id)
+        product.increment_views()
+        
+        data = {
+            'id': str(product.id),
+            'name': product.name,
+            'price': product.price,
+            'description': product.description,
+            'category': product.category,
+            'thumbnail': product.thumbnail,
+            'product_views': product.product_views,
+            'created_at': product.created_at.isoformat() if product.created_at else None,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+            'user_username': product.user.username if product.user_id else None,
+        }
+        return JsonResponse(data)
+    except Product.DoesNotExist:
+        return JsonResponse({'detail': 'Not found'}, status=404)
 
-   
 def register(request):
     form = UserCreationForm()
 
@@ -141,3 +163,170 @@ def delete_product(request, id):
     product = get_object_or_404(Product, pk=id)
     product.delete()
     return HttpResponseRedirect(reverse('main:show_main'))
+
+@csrf_exempt
+@require_POST
+def add_product_ajax(request):
+    name = strip_tags(request.POST.get("name"))
+    price = request.POST.get("price")
+    description = strip_tags(request.POST.get("description"))
+    category = request.POST.get("category")
+    thumbnail = request.POST.get("thumbnail")
+    is_featured = request.POST.get("is_featured") == 'on'
+    user = request.user
+    
+    new_product = Product(
+        name=name,
+        price=price,
+        description=description,
+        category=category,
+        thumbnail=thumbnail,
+        is_featured=is_featured,
+        user=user
+    )
+    new_product.save()
+    
+    return HttpResponse(b"CREATED", status=201)
+
+@csrf_exempt
+def update_product_ajax(request, id):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, pk=id, user=request.user)
+        
+        product.name = strip_tags(request.POST.get("name"))
+        product.price = request.POST.get("price")
+        product.description = strip_tags(request.POST.get("description"))
+        product.category = request.POST.get("category")
+        product.thumbnail = request.POST.get("thumbnail")
+        product.is_featured = request.POST.get("is_featured") == 'on'
+        
+        product.save()
+        return HttpResponse(b"UPDATED", status=200)
+    
+    return HttpResponse(b"METHOD_NOT_ALLOWED", status=405)
+
+@csrf_exempt
+@require_POST
+def delete_product_ajax(request, id):
+    product = get_object_or_404(Product, pk=id, user=request.user)
+    product.delete()
+    return HttpResponse(b"DELETED", status=200)
+
+@require_POST
+def login_ajax(request):
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Invalid JSON format'
+        }, status=400)
+
+    username = data.get('username', '')
+    password = data.get('password', '')
+
+    # Validasi input tidak kosong
+    if not username or not password:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Username and password are required'
+        }, status=400)
+
+    # Batasi panjang input untuk mencegah abuse
+    if len(username) > 150 or len(password) > 128:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Input too long'
+        }, status=400)
+
+    # Autentikasi user
+    user = authenticate(request, username=username, password=password)
+
+    if user is not None:
+        login(request, user)
+        response_data = {
+            'status': 'success',
+            'message': 'Login successful',
+            'redirect_url': reverse('main:show_main')
+        }
+        response = JsonResponse(response_data)
+        response.set_cookie('last_login', str(datetime.datetime.now()))
+        return response
+    else:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid username or password'
+        }, status=401)
+
+
+@require_POST
+def register_ajax(request):
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Invalid JSON format'
+        }, status=400)
+
+    username = data.get('username', '')
+    password1 = data.get('password1', '')
+    password2 = data.get('password2', '')
+
+    # Validasi input tidak kosong
+    if not username or not password1 or not password2:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'All fields are required'
+        }, status=400)
+
+    # Validasi password cocok
+    if password1 != password2:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Passwords do not match'
+        }, status=400)
+
+    # Validasi panjang password minimal
+    if len(password1) < 8:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Password must be at least 8 characters long'
+        }, status=400)
+
+    # Validasi panjang username
+    if len(username) > 150:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Username too long'
+        }, status=400)
+
+    # Validasi karakter username (opsional tapi direkomendasikan)
+    if not username.isalnum() and '_' not in username:
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Username can only contain letters, numbers, and underscores'
+        }, status=400)
+
+    # Cek apakah username sudah ada
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({
+            'status': 'error', 
+            'message': 'Username already exists'
+        }, status=400)
+
+    try:
+        # Buat user baru
+        user = User.objects.create_user(username=username, password=password1)
+        user.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Registration successful',
+            'redirect_url': reverse('main:login')
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Failed to create account. Please try again.'
+        }, status=500)
