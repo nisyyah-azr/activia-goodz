@@ -15,6 +15,7 @@ from django.utils.html import strip_tags
 import json
 from django.contrib.auth.models import User
 import re
+import requests
 
 # Create your views here.
 @login_required(login_url='/login')
@@ -360,3 +361,76 @@ def register_ajax(request):
             'status': 'error',
             'message': 'Failed to create account. Please try again.'
         }, status=500)
+    
+
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        # Fetch image from external source
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Return the image with proper content type
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+    
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            # Validasi user harus login
+            if not request.user.is_authenticated:
+                return JsonResponse({
+                    "status": "error",
+                    "message": "User not authenticated"
+                }, status=401)
+            
+            name = strip_tags(data.get("name", ""))
+            price = data.get("price", 0)
+            description = strip_tags(data.get("description", ""))
+            category = data.get("category", "women")
+            thumbnail = data.get("thumbnail", "")
+            is_featured = data.get("is_featured", False)
+            
+            # Validasi data
+            if not name or not price or not description:
+                return JsonResponse({
+                    "status": "error",
+                    "message": "Name, price, and description are required"
+                }, status=400)
+            
+            new_product = Product(
+                name=name,
+                price=int(price),
+                description=description,
+                category=category,
+                thumbnail=thumbnail,
+                is_featured=is_featured,
+                user=request.user
+            )
+            new_product.save()
+            
+            return JsonResponse({
+                "status": "success",
+                "message": "Product created successfully!"
+            }, status=200)
+            
+        except Exception as e:
+            return JsonResponse({
+                "status": "error",
+                "message": str(e)
+            }, status=500)
+    else:
+        return JsonResponse({
+            "status": "error",
+            "message": "Invalid request method"
+        }, status=400)
